@@ -1,0 +1,357 @@
+swagger: '2.0'
+
+schemes: 
+  - http
+  - https
+
+basePath: /home
+
+info:
+  version: 0.0.1
+  title: Home Assistant
+  description: Home assistant functions
+  contact: 
+    name: Carlos Alberto Athenesi
+    email: cathenesi@gmail.com
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+
+securityDefinitions:
+  BasicAuth:
+    type: basic
+
+security:
+  - BasicAuth: []
+  
+consumes:
+  - application/json
+produces:
+  - application/json
+
+tags: 
+  - name: Action
+  - name: Place
+
+paths:
+
+  '/places':
+    get:
+     tags: 
+      - Place
+     summary: Returns places monitored 
+     operationId: findAllPlaces
+     parameters:
+      - in: header
+        name: Authorization
+        type: string
+        required: true
+     responses:
+      200:
+        description: Success
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/Place'
+      401:
+        description: Unauthorized
+      500:
+        description: Internal server error
+  
+  '/place/{placeId}/item/{itemId}/action/{actionId}/execute':
+    get:
+     tags: 
+      - Place
+     summary: Execute an action
+     operationId: executeAction
+     parameters:
+      - in: header
+        name: Authorization
+        type: string
+        required: true
+      - in: path
+        name: placeId
+        description: Id of the place that contains the item where the action will be executed
+        type: integer
+        format: int64
+        required: true
+      - in: path
+        name: itemId
+        description: Id of the item where the action will be executed
+        type: integer
+        format: int64
+        required: true
+      - in: path
+        name: actionId
+        description: Id of the action that will be executed
+        type: integer
+        format: int64
+        required: true
+     responses:
+      200:
+          description: Success
+      401:
+        description: Unauthorized
+      500:
+        description: Internal server error
+  
+  '/place/{placeId}/addItem':
+    post:
+     tags: 
+      - Place
+     summary: Add a new item to monitoring 
+     operationId: addItemToPlace
+     parameters:
+      - in: header
+        name: Authorization
+        type: string
+        required: true
+      - in: path
+        name: placeId
+        description: Id of the place to be modified
+        type: integer
+        format: int64
+        required: true
+      - in: body
+        name: itemId
+        schema:
+          type: integer
+          format: int64
+          example: 1
+        required: true
+     responses:
+      201:
+        description: Success
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/MonitoredItem'
+      400:
+        description: Invalid request
+      401:
+        description: Unauthorized
+      500:
+        description: Internal server error
+
+  '/place/{placeId}/item/{itemId}':
+    delete:
+     tags: 
+      - Place
+     summary: Remove an item 
+     operationId: removeItemFromPlace
+     parameters:
+      - in: header
+        name: Authorization
+        type: string
+        required: true
+      - in: path
+        name: placeId
+        description: Id of the place that will have an item removed
+        type: integer
+        format: int64
+        required: true
+      - in: path
+        name: itemId
+        description: Id of the item to be removed from the place
+        type: integer
+        format: int64
+        required: true
+     responses:
+      201:
+        description: Success
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/MonitoredItem'
+      400:
+        description: Invalid request
+      401:
+        description: Unauthorized
+      500:
+        description: Internal server error
+
+  '/action':
+    post:
+     tags: 
+      - Action
+     summary: Create a new action 
+     operationId: createAction
+     parameters:
+      - in: header
+        name: Authorization
+        type: string
+        required: true
+      - in: body
+        name: action
+        schema:
+          $ref: '#/definitions/Action'
+        description: Data to create the action
+        required: true
+     responses:
+      201:
+        description: Success
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/Action'
+      400:
+        description: Invalid request
+      401:
+        description: Unauthorized
+      500:
+        description: Internal server error
+
+  '/action/{actionId}':
+    get:
+     tags: 
+      - Action
+     summary: Retrieve an action using its ID 
+     operationId: findAction
+     parameters:
+      - in: header
+        name: Authorization
+        type: string
+        required: true
+      - in: path
+        name: actionId
+        description: Id of the action 
+        type: integer
+        format: int64
+        required: true
+     responses:
+      201:
+        description: Success
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/Action'
+      400:
+        description: Invalid request
+      401:
+        description: Unauthorized
+      500:
+        description: Internal server error
+
+    put:
+     tags: 
+      - Action
+     summary: Update an action using its ID 
+     operationId: updateAction
+     parameters:
+      - in: header
+        name: Authorization
+        type: string
+        required: true
+      - in: path
+        name: actionId
+        description: Id of the action 
+        type: integer
+        format: int64
+        required: true
+      - in: body
+        name: action
+        schema:
+          $ref: '#/definitions/Action'
+        description: Data to update the action
+        required: true
+     responses:
+      201:
+        description: Success
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/Action'
+      400:
+        description: Invalid request
+      401:
+        description: Unauthorized
+      500:
+        description: Internal server error
+
+    delete:
+     tags: 
+      - Action
+     summary: Remove an action using its ID 
+     operationId: removeAction
+     parameters:
+      - in: header
+        name: Authorization
+        type: string
+        required: true
+      - in: path
+        name: actionId
+        description: Id of the action 
+        type: integer
+        format: int64
+        required: true
+     responses:
+      201:
+        description: Success
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/Action'
+      400:
+        description: Invalid request
+      401:
+        description: Unauthorized
+      500:
+        description: Internal server error
+
+definitions:
+
+  Temperature:
+    type: object
+    properties:
+      celsius:
+        type: integer
+        format: int32
+        example: 31
+  
+  Place:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        example: 1
+      name:
+        type: string
+        example: Kitchen
+      temperature:
+        $ref: '#/definitions/Temperature'
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/MonitoredItem'
+
+  MonitoredItem:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        example: 1
+      name:
+        type: string
+        example: Roof lamp
+      actions:
+        type: array
+        items:
+          $ref: '#/definitions/Action'
+
+  Action:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        example: 1
+      name:
+        type: string
+        example: On/Off
+      type:
+        type: string
+        enum: 
+          - SWITCH
+          - SENSOR
